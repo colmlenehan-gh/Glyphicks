@@ -192,7 +192,7 @@ internal fun AboutScreen(
                 icon = FontAwesomeIcons.Brands.Github,
                 title = "GitHub Repository",
                 subtitle = "View source and contributions",
-                onClick = { uriHandler.openUri("https://github.com/oliver-lebaigue-bright-bench/glyph-syncronator") }
+                onClick = { uriHandler.openUri("https://github.com/colmlenehan-gh/Glyphicks") }
             )
 
             // License Action

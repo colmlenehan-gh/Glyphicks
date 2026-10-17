@@ -5,7 +5,7 @@
 Please report security problems privately rather than in a public issue.
 
 1. Use GitHub's **Report a vulnerability** option under the repository's **Security** tab (private vulnerability reporting), or
-2. Contact the maintainers privately through the project's [Discord](https://discord.gg/cQ4hxNE8fX) and ask for a private channel.
+2. Contact the maintainer, Colm Lenehan, through the contact details on his [GitHub profile](https://github.com/colmlenehan-gh).
 
 Include the affected component, the version or commit, clear reproduction steps, and the impact you expect. You can expect an acknowledgement within a few days. Please allow time for a fix before any public disclosure.
 

@@ -12,6 +12,8 @@ All notable changes to this repository are recorded here. The format follows [Ke
 - Open Graph and Twitter card metadata for the website.
 
 ### Changed
+- Rebranded the README as Glyphicks, a fork of Glyphix by Oliver Lebaigue, with a credits section. Download, badge, issue and documentation links now point to this repository.
+- Rerouted the website links, the app's zones.config download, update check and About-screen repository button, plus the script docs, to this repository. Licence text and credit entries are unchanged.
 - Rewrote the README: accurate links, architecture diagram, component table, build instructions and repository map.
 - Rewrote the desktop companion README to match the real scripts, ports and flags.
 - Pages deployment now builds the site and publishes `website/dist/public`, instead of uploading the unbuilt `website/` directory.

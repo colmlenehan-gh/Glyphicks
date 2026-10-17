@@ -671,7 +671,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun fetchGitHubReleases(): List<Announcement> = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
         try {
-            val url = URL("https://api.github.com/repos/oliver-lebaigue-bright-bench/glyph-syncronator/releases?per_page=10")
+            val url = URL("https://api.github.com/repos/colmlenehan-gh/Glyphicks/releases?per_page=10")
             connection = url.openConnection() as HttpURLConnection
             connection.setRequestProperty("Accept", "application/vnd.github+json")
             connection.setRequestProperty("User-Agent", "Glyphix-App")
@@ -776,7 +776,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     if (latestRelease != null && latestRelease.version != null && isNewerVersion(latestRelease.version, BuildConfig.VERSION_NAME)) {
                         _appUpdateStatus.value = AppUpdateStatus.Available(
                             version = latestRelease.version,
-                            url = latestRelease.link ?: "https://github.com/oliver-lebaigue-bright-bench/glyph-syncronator/releases",
+                            url = latestRelease.link ?: "https://github.com/colmlenehan-gh/Glyphicks/releases",
                             apkUrl = latestRelease.apkUrl,
                             title = latestRelease.title,
                             changelog = latestRelease.message
@@ -1097,7 +1097,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 Log.d("MainViewModel", "Checking remote config version...")
                 val url =
-                    URL("https://raw.githubusercontent.com/oliver-lebaigue-bright-bench/glyph-syncronator/main/zones.config?t=${System.currentTimeMillis()}")
+                    URL("https://raw.githubusercontent.com/colmlenehan-gh/Glyphicks/main/zones.config?t=${System.currentTimeMillis()}")
                 connection = url.openConnection() as HttpURLConnection
                 connection.useCaches = false
                 connection.connectTimeout = 5000
@@ -1189,7 +1189,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         var connection: HttpURLConnection? = null
         return try {
             Log.d("MainViewModel", "Performing zones.config update...")
-            val url = URL("https://raw.githubusercontent.com/oliver-lebaigue-bright-bench/glyph-syncronator/main/zones.config?t=${System.currentTimeMillis()}")
+            val url = URL("https://raw.githubusercontent.com/colmlenehan-gh/Glyphicks/main/zones.config?t=${System.currentTimeMillis()}")
             connection = withContext(Dispatchers.IO) {
                 url.openConnection()
             } as HttpURLConnection

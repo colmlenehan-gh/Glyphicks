@@ -4,8 +4,8 @@ Thank you for helping improve Glyphix. This guide covers how to set up each part
 
 ## Before you start
 
-- Search the [issue tracker](https://github.com/oliver-lebaigue-bright-bench/glyph-syncronator/issues) for an existing report or request.
-- For larger changes, open an issue or ask on [Discord](https://discord.gg/cQ4hxNE8fX) first so the direction is agreed before you invest time.
+- Search the [issue tracker](https://github.com/colmlenehan-gh/Glyphicks/issues) for an existing report or request.
+- For larger changes, open an issue first so the direction is agreed before you invest time.
 - By contributing you agree that your work is released under the repository's [MIT licence](LICENSE).
 
 ## Development setup

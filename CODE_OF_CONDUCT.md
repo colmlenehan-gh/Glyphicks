@@ -18,8 +18,8 @@ Glyphix is built by a community of people who enjoy music, hardware and software
 
 ## Scope
 
-This applies to the repository, its issues and pull requests, and the project's official community spaces such as the Discord server, and to anyone representing the project in public.
+This applies to the repository, its issues and pull requests, and any other official project space, and to anyone representing the project in public.
 
 ## Enforcement
 
-Maintainers may remove comments, lock threads, or restrict participation for behaviour that breaks these rules. To report a concern, contact the maintainers privately through Discord or via the private reporting route described in [SECURITY.md](SECURITY.md). Reports are handled confidentially.
+Maintainers may remove comments, lock threads, or restrict participation for behaviour that breaks these rules. To report a concern, contact the maintainer privately using the route described in [SECURITY.md](SECURITY.md). Reports are handled confidentially.
