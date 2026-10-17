@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - '**.md'
+      - 'Docs/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  website:
+    name: Website (type-check and build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: website/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: website/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
+      - run: pnpm run build
+
+  python:
+    name: Python scripts (compile and lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install linters
+        run: python -m pip install pyflakes
+      - name: Byte-compile
+        run: python -I -m py_compile desktop-companion/*.py "PYTHON SCRIPT"/*.py
+      - name: Pyflakes
+        run: python -m pyflakes desktop-companion/*.py "PYTHON SCRIPT"/*.py
+
+  config:
+    name: Validate zones.config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JSON syntax and version field
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          data = json.load(open("zones.config"))
+          if "version" not in data:
+              sys.exit("zones.config has no top-level 'version' field")
+          print("zones.config OK, version", data["version"])
+          PY
