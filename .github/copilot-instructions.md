@@ -128,8 +128,7 @@ Audio File → FFT Analysis → .nglyph Generation → GlyphModder.py → Glyphe
 - Use logcat to monitor FFT magnitudes and glyph brightness values
 
 ## File Structure Reference
-- `app/src/main/java/com/better/nothing/music/vizualizer/`: Core app logic
+- `app/src/main/java/com/glyphix/app/`: Core app logic
 - `zones.config`: Glyph frequency zone definitions
 - `PYTHON SCRIPT/`: Offline processing tools
-- `glyph-matrix-sdk-2_0.aar`: Hardware control library</content>
-<parameter name="filePath">/home/oliver/Projects/glyph-syncronator/.github/copilot-instructions.md
+- `glyph-matrix-sdk-2_0.aar`: Hardware control library
