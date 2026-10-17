@@ -53,21 +53,18 @@ Config.set('graphics', 'minimum_height', '700')
 from kivy.core.window import Window
 from kivy.core.text import LabelBase
 from kivy.clock import Clock
-from kivy.graphics import Color, Ellipse, Rectangle, Line, RoundedRectangle
+from kivy.graphics import Color, Ellipse, Line, RoundedRectangle
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.metrics import dp
 
-import kivymd
 from kivymd.app import MDApp
 from kivymd.uix.label import MDLabel
-from kivymd.uix.card import MDCard
-from kivymd.uix.slider import MDSlider, MDSliderHandle, MDSliderValueLabel
+from kivymd.uix.slider import MDSlider, MDSliderHandle
 from kivymd.uix.selectioncontrol import MDSwitch
-from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText
 from kivymd.uix.menu import MDDropdownMenu
 
@@ -238,7 +235,7 @@ if HAS_CTYPES and sys.platform == "win32":
     try:
         user32 = ctypes.windll.user32
         kernel32 = ctypes.windll.kernel32
-    except:
+    except Exception:
         HAS_CTYPES = False
 
 WH_KEYBOARD_LL = 13
@@ -881,7 +878,7 @@ class OpenRGBManager:
                     dev.set_colors([black] * len(dev.leds), fast=True)
                 else:
                     dev.set_color(black)
-            except:
+            except Exception:
                 pass
 
 # ==============================================================================
@@ -900,10 +897,9 @@ def get_broadcast_addresses():
     except Exception: pass
 
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
         if local_ip and not local_ip.startswith('127.'):
             parts = local_ip.split('.')
             if len(parts) == 4:
@@ -914,10 +910,9 @@ def get_broadcast_addresses():
 
 def get_local_ip():
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
         return ip
     except Exception:
         return "127.0.0.1"
@@ -1824,7 +1819,7 @@ class GlyphixMaterialApp(MDApp):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             try: sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-            except: pass
+            except Exception: pass
         try:
             sock.bind(("0.0.0.0", DISCOVERY_PORT))
             sock.settimeout(1.0)
@@ -1845,7 +1840,7 @@ class GlyphixMaterialApp(MDApp):
             self.log(f"Discovery responder error: {e}")
         finally:
             try: sock.close()
-            except: pass
+            except Exception: pass
 
     def _toggle_discovery(self):
         if self.is_discovering:
@@ -1871,7 +1866,7 @@ class GlyphixMaterialApp(MDApp):
             try:
                 for a in addrs:
                     try: sock.sendto(msg, (a, DISCOVERY_PORT))
-                    except: pass
+                    except Exception: pass
                 for _ in range(5):
                     try:
                         data, addr = sock.recvfrom(1024)
@@ -1880,10 +1875,10 @@ class GlyphixMaterialApp(MDApp):
                             break
                     except socket.timeout:
                         break
-                    except: pass
+                    except Exception: pass
                 if found: break
                 time.sleep(0.2)
-            except: continue
+            except Exception: continue
         sock.close()
         Clock.schedule_once(lambda dt: self._on_discovery_done(found))
 
@@ -1951,7 +1946,8 @@ class GlyphixMaterialApp(MDApp):
                 try:
                     data, addr = sock.recvfrom(8192)
                     if not data: continue
-                    samples = np.frombuffer(data, dtype=np.int16)
+                    if len(data) < 2: continue
+                    samples = np.frombuffer(data[:len(data) & ~1], dtype=np.int16)
                     try:
                         self.viz_queue.put_nowait(samples)
                     except queue.Full:
@@ -1965,7 +1961,7 @@ class GlyphixMaterialApp(MDApp):
         finally:
             self.rgb_manager.stop()
             try: sock.close()
-            except: pass
+            except Exception: pass
             Clock.schedule_once(lambda dt: self._on_stream_stopped())
 
     def _stream_worker(self, addr, device, port=UDP_PORT):
@@ -1979,7 +1975,7 @@ class GlyphixMaterialApp(MDApp):
                             input=True, input_device_index=device["index"],
                             frames_per_buffer=chunk_size)
             actual_rate = TARGET_RATE
-        except:
+        except Exception:
             try:
                 stream = p.open(format=FORMAT, channels=channels, rate=native_rate,
                                 input=True, input_device_index=device["index"],
@@ -2009,7 +2005,7 @@ class GlyphixMaterialApp(MDApp):
         finally:
             self.rgb_manager.stop()
             try: stream.stop_stream(); stream.close(); p.terminate(); sock.close()
-            except: pass
+            except Exception: pass
             Clock.schedule_once(lambda dt: self._on_stream_stopped())
 
     def _viz_worker(self, actual_rate):
@@ -2102,7 +2098,7 @@ class GlyphixMaterialApp(MDApp):
         self.status_capsule_lbl.text = "● STANDBY"
         self.level_queue.put([0.0]*64)
         try: self.fan_preview_queue.put_nowait({"__all__": [(0, 0, 0)] * 16})
-        except: pass
+        except Exception: pass
         self.hook_watcher.stop()
 
     def _update_loop(self, dt):

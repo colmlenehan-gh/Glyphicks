@@ -9,7 +9,6 @@ import shutil
 import subprocess
 import threading
 import queue
-import asyncio
 import math
 import colorsys
 
@@ -141,7 +140,7 @@ if HAS_CTYPES and sys.platform == "win32":
     try:
         user32 = ctypes.windll.user32
         kernel32 = ctypes.windll.kernel32
-    except:
+    except Exception:
         HAS_CTYPES = False
 
 WH_KEYBOARD_LL = 13
@@ -555,7 +554,6 @@ class OpenRGBManager:
         return False
 
     def is_fan_device(self, dev):
-        name = (getattr(dev, "name", "") or "").lower()
         dev_type = getattr(dev, "type", None)
         if dev_type in (DeviceType.COOLER, DeviceType.CASE, DeviceType.LEDSTRIP, DeviceType.ACCESSORY, DeviceType.DRAM):
             return True
@@ -843,9 +841,9 @@ class OpenRGBManager:
                     dev.set_colors([black] * len(dev.leds), fast=True)
                 else:
                     dev.set_color(black)
-            except:
+            except Exception:
                 try: dev.set_color(black)
-                except: pass
+                except Exception: pass
 
 def get_broadcast_addresses():
     broadcasts = {'255.255.255.255'}
@@ -860,10 +858,9 @@ def get_broadcast_addresses():
     except Exception: pass
 
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
         if local_ip and not local_ip.startswith('127.'):
             parts = local_ip.split('.')
             if len(parts) == 4:
@@ -874,10 +871,9 @@ def get_broadcast_addresses():
 
 def get_local_ip():
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
         return ip
     except Exception:
         return "127.0.0.1"
@@ -1768,7 +1764,7 @@ class CompanionApp(ctk.CTk):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             try: sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-            except: pass
+            except Exception: pass
         try:
             sock.bind(("0.0.0.0", DISCOVERY_PORT))
             sock.settimeout(1.0)
@@ -1789,7 +1785,7 @@ class CompanionApp(ctk.CTk):
             self.log(f"Discovery responder error: {e}")
         finally:
             try: sock.close()
-            except: pass
+            except Exception: pass
 
     def _discovery_worker(self):
         found = None
@@ -1799,7 +1795,7 @@ class CompanionApp(ctk.CTk):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             try: sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-            except: pass
+            except Exception: pass
         sock.settimeout(0.3)
         msg = b"GLYPHIX_DISCOVERY_REQUEST"
         addrs = get_broadcast_addresses()
@@ -1808,7 +1804,7 @@ class CompanionApp(ctk.CTk):
             try:
                 for a in addrs:
                     try: sock.sendto(msg, (a, DISCOVERY_PORT))
-                    except: pass
+                    except Exception: pass
                 for _ in range(5):
                     try:
                         data, addr = sock.recvfrom(1024)
@@ -1817,11 +1813,11 @@ class CompanionApp(ctk.CTk):
                             break
                     except socket.timeout:
                         break
-                    except: pass
+                    except Exception: pass
                 if found:
                     break
                 time.sleep(0.2)
-            except: continue
+            except Exception: continue
         sock.close()
         
         self.after(0, self._on_discovery_done, found)
@@ -1906,7 +1902,8 @@ class CompanionApp(ctk.CTk):
                 try:
                     data, addr = sock.recvfrom(8192)
                     if not data: continue
-                    samples = np.frombuffer(data, dtype=np.int16)
+                    if len(data) < 2: continue
+                    samples = np.frombuffer(data[:len(data) & ~1], dtype=np.int16)
                     try:
                         self.viz_queue.put_nowait(samples)
                     except queue.Full:
@@ -1927,7 +1924,7 @@ class CompanionApp(ctk.CTk):
         finally:
             self.rgb_manager.stop()
             try: sock.close()
-            except: pass
+            except Exception: pass
             self.after(0, self._on_stream_stopped)
 
     def _stream_worker(self, addr, device, port=UDP_PORT):
@@ -1941,7 +1938,7 @@ class CompanionApp(ctk.CTk):
                             input=True, input_device_index=device["index"],
                             frames_per_buffer=chunk_size)
             actual_rate = TARGET_RATE
-        except:
+        except Exception:
             try:
                 stream = p.open(format=FORMAT, channels=channels, rate=native_rate,
                                 input=True, input_device_index=device["index"],
@@ -1955,7 +1952,7 @@ class CompanionApp(ctk.CTk):
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try: sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 256 * 1024)
-        except: pass
+        except Exception: pass
 
         interp_indices = None
         if actual_rate != TARGET_RATE:
@@ -2086,7 +2083,7 @@ class CompanionApp(ctk.CTk):
         self.level_queue.put([0.0]*64)
         try:
             self.fan_preview_queue.put_nowait({"__all__": [(0, 0, 0)] * 16})
-        except:
+        except Exception:
             pass
         self.hook_watcher.stop()
 

@@ -58,7 +58,6 @@ import urllib.request
 import urllib.error
 import time
 import tempfile
-import shutil
 import soundfile as sf
 from typing import Optional, Tuple  # added typing
 
@@ -104,13 +103,13 @@ def convert_to_ogg(input_path, output_path):
     # append any user-specified extra ffmpeg args
     cmd += list(extra)
     cmd += [output_path]
-    print(f"[+] Converting with ffmpeg...")
+    print("[+] Converting with ffmpeg...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(res.stdout)
         print(res.stderr)
         raise RuntimeError(f"ffmpeg conversion failed for {input_path}")
-    print(f"[+] Conversion complete!")
+    print("[+] Conversion complete!")
     return output_path
 
 def load_audio_mono(path):
@@ -696,7 +695,7 @@ def run_glyphmodder_write(nglyph_path: str, ogg_path: str, title: Optional[str] 
         print(f"GlyphModder.py not found in working directory. Searched: {glyphmodder_path}")
         print("Downloading GlyphModder.py from SebiAI's GitHub repository...")
         download_glyphmodder_to_cwd(overwrite=True)
-        print(f"[+] Proceeding with the downloaded GlyphModder.py from cwd.")
+        print("[+] Proceeding with the downloaded GlyphModder.py from cwd.")
         
     # ensure NGlyph is an absolute path (so GlyphModder can find it from any cwd)
     arg_nglyph = os.path.abspath(nglyph_path)
@@ -717,7 +716,7 @@ def run_glyphmodder_write(nglyph_path: str, ogg_path: str, title: Optional[str] 
     # final ogg should be written into cwd (if provided)
     final_ogg_path = os.path.join(cwd or os.getcwd(), arg_ogg) if cwd else os.path.abspath(arg_ogg)
     #print(f"[+] GlyphModder produced: {final_ogg_path}")
-    print(f"[+] GlyphModder done!")
+    print("[+] GlyphModder done!")
     return final_ogg_path
 
 # new helper: ensure GlyphModder.py exists in current directory (download from SebiAI if needed)
@@ -797,7 +796,8 @@ def generate_help_from_zones(cfg_path="zones.config"):
         return (f"{cfg_path} not found in working directory.\n"
                 "Download it from the repository.")
     try:
-        raw = json.load(open(cfg_path, "r", encoding="utf-8"))
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            raw = json.load(f)
     except Exception as e:
         return f"Failed to read {cfg_path}: {e}"
     
@@ -922,7 +922,8 @@ if __name__ == "__main__":
         print("[!] zones.config not found in working directory.")
         sys.exit(1)
 
-    raw_cfg = json.load(open(cfg_path, "r", encoding="utf-8"))
+    with open(cfg_path, "r", encoding="utf-8") as f:
+        raw_cfg = json.load(f)
 
     # require multi-config format (no legacy single-config)
     if "zones" in raw_cfg:
@@ -1044,9 +1045,9 @@ if __name__ == "__main__":
             
             if composed_file:
                 # Rename to clean final name
-                os.rename(composed_file, desired_final_ogg)
+                os.replace(composed_file, desired_final_ogg)
                 final_ogg = desired_final_ogg
-                print(f"[+] Finished this file!")
+                print("[+] Finished this file!")
                 
                 # Clean up intermediate files (_fixed.ogg, original converted ogg if different)
                 for suffix in ["_fixed.ogg"]:

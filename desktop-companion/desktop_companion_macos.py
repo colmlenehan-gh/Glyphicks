@@ -5,7 +5,6 @@ import time
 import sys
 import threading
 import queue
-import asyncio
 import math
 import webbrowser
 
@@ -138,7 +137,7 @@ class OpenRGBManager:
         color = RGBColor(int(r * 255), int(g * 255), int(b * 255))
         for dev in self.devices:
             try: dev.set_color(color)
-            except: pass
+            except Exception: pass
         self.last_sync_time = now
 
     def stop(self):
@@ -146,7 +145,7 @@ class OpenRGBManager:
         black = RGBColor(0, 0, 0)
         for dev in self.devices:
             try: dev.set_color(black)
-            except: pass
+            except Exception: pass
 
 def get_broadcast_addresses():
     broadcasts = {'255.255.255.255'}
@@ -161,10 +160,9 @@ def get_broadcast_addresses():
     except Exception: pass
 
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
         if local_ip and not local_ip.startswith('127.'):
             parts = local_ip.split('.')
             if len(parts) == 4:
@@ -249,7 +247,7 @@ class CompanionApp(ctk.CTk):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             try: sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-            except: pass
+            except Exception: pass
         try:
             sock.bind(("0.0.0.0", DISCOVERY_PORT))
             sock.settimeout(1.0)
@@ -269,7 +267,7 @@ class CompanionApp(ctk.CTk):
             self.log(f"Discovery responder error: {e}")
         finally:
             try: sock.close()
-            except: pass
+            except Exception: pass
 
     def _check_blackhole_status(self):
         has_blackhole = any("BlackHole" in d["name"] for d in self.audio_devices)
@@ -586,7 +584,7 @@ class CompanionApp(ctk.CTk):
                 if data == b"GLYPHIX_DISCOVERY_RESPONSE":
                     found = addr[0]
                     break
-            except: continue
+            except Exception: continue
         sock.close()
         self.after(0, self._on_discovery_done, found)
 

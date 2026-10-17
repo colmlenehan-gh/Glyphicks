@@ -1,44 +1,56 @@
 # Glyphix Desktop Companion
 
-This script captures system audio from your Windows PC and streams it to the Glyphix Android app via UDP. It allows the Glyphs, haptics, and visualizers to react to your computer's audio in real-time.
+The companion captures your computer's audio and streams it to the Glyphix Android app over UDP, so the Glyphs, haptics and visualizers react to what your PC is playing. The Python variants can also drive PC RGB lighting through [OpenRGB](https://openrgb.org/).
+
+## Variants
+
+| File | Platform | Interface |
+| :--- | :--- | :--- |
+| `desktop_companion.py` | Windows 10/11 | CustomTkinter GUI (WASAPI loopback capture) |
+| `desktop_companion_kivymd.py` | Windows | KivyMD Material UI, launched with `--material` |
+| `desktop_companion_macos.py` | macOS | CustomTkinter GUI, needs [BlackHole 2ch](https://existential.audio/blackhole/) to capture system audio |
+| `../desktop-companion-wpf/` | Windows, .NET 8 | Native WPF app with NAudio and OpenRGB.NET |
 
 ## Prerequisites
 
-- **Windows 10/11** (Required for WASAPI loopback capture).
-- **Python 3.8+** installed.
-- **Glyphix Android App** installed on a phone on the same Wi-Fi network.
+- Python 3.8 or newer for the Python variants.
+- The Glyphix Android app on a phone connected to the **same network** as the computer.
+- Optional: OpenRGB running with its SDK server enabled, for PC RGB sync.
 
 ## Installation
 
-1. Install the required Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
+
+Platform-specific packages (`PyAudioWPatch` on Windows, `pyaudio` on macOS) are selected automatically through environment markers in `requirements.txt`.
 
 ## Usage
 
-1. Open the **Glyphix** app on your phone.
-2. Go to the **Audio** tab.
-3. Select **Desktop Companion (UDP)** as the capture source.
-4. On your PC, run the script:
+1. Open **Glyphix** on the phone and go to the **Audio** tab.
+2. Select **Desktop Companion (UDP)** as the capture source.
+3. On the computer, start a companion:
+
    ```bash
-   python desktop_companion.py
+   python desktop_companion.py              # Windows, default GUI
+   python desktop_companion.py --material   # Windows, KivyMD UI
+   python desktop_companion_macos.py        # macOS
    ```
 
-The script will automatically search for your phone on the network and start streaming.
+The companion broadcasts on the local network to find the phone, then starts streaming.
 
-## Enhanced Version (OpenRGB & Keyboard Sync)
+## Network details
 
-For users who want to sync their desktop RGB (via OpenRGB) and have the lighting pause during typing to prevent flicker, use:
-```bash
-python openrgb_companion.py
-```
-This version also includes optimized frequency ranges for the Nothing Phone (2a).
+| Purpose | Protocol and port |
+| :--- | :--- |
+| Phone discovery | UDP `12348` |
+| Audio stream | UDP `12347` |
 
-## Manual Connection
+If discovery fails, check that both devices are on the same subnet, that Wi-Fi client isolation is off, and that your firewall allows both ports. Packets that are shorter than one sample or malformed are ignored.
 
-If auto-discovery fails, you can force a connection to a specific IP address:
-```bash
-python desktop_companion.py --ip 192.168.1.50
-```
-(Replace with the IP address shown in the Glyphix app).
+## Troubleshooting
+
+- **No audio detected**: confirm something is actually playing on the default output device, since loopback capture follows it.
+- **Phone not found**: restart the companion after the phone's app is on the Audio tab, and verify the ports above are open.
+- **RGB flicker while typing** (WPF variant): enable the **Typing Suppression** option, which is on by default.
+- **No system audio on macOS**: install BlackHole 2ch and select it as the output device, as the app's log reminds you.

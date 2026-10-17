@@ -1,7 +1,10 @@
-PyAudioWPatch
+PyAudioWPatch; sys_platform == "win32"
 numpy
 openrgb-python
 kivy>=2.3.0
 kivymd>=2.0.0
 customtkinter
 Pillow
+
+pyaudio; sys_platform == "darwin"
+pynput
