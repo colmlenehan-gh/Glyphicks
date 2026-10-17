@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Bottom Semicircle / Bowl -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 22.8,57.1 H 85.2 C 85.2,74.33 71.23,88.3 54,88.3 C 36.77,88.3 22.8,74.33 22.8,57.1 Z" />
+
+    <!-- Center Radiant Pill -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 48.7,25.15 C 48.7,22.22 51.07,19.85 54,19.85 C 56.93,19.85 59.3,22.22 59.3,25.15 V 40.25 C 59.3,43.18 56.93,45.55 54,45.55 C 51.07,45.55 48.7,43.18 48.7,40.25 Z" />
+
+    <!-- Left Radiant Pill (-45 deg) -->
+    <group
+        android:pivotX="27.5"
+        android:pivotY="34.9"
+        android:rotation="-45">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M 22.2,27.35 C 22.2,24.42 24.57,22.05 27.5,22.05 C 30.43,22.05 32.8,24.42 32.8,27.35 V 42.45 C 32.8,45.38 30.43,47.75 27.5,47.75 C 24.57,47.75 22.2,45.38 22.2,42.45 Z" />
+    </group>
+
+    <!-- Right Radiant Pill (+45 deg) -->
+    <group
+        android:pivotX="80.5"
+        android:pivotY="34.9"
+        android:rotation="45">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M 75.2,27.35 C 75.2,24.42 77.57,22.05 80.5,22.05 C 83.43,22.05 85.8,24.42 85.8,27.35 V 42.45 C 85.8,45.38 83.43,47.75 80.5,47.75 C 77.57,47.75 75.2,45.38 75.2,42.45 Z" />
+    </group>
+</vector>

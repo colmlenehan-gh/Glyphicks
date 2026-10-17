@@ -1,0 +1,74 @@
+package com.glyphix.app.ui
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.glyphix.app.ui.SecondaryScreens.CommunityPresetsScreen
+import com.glyphix.app.ui.SecondaryScreens.LeaderboardScreen
+import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
+
+@Composable
+internal fun CommunityOverlays(
+    viewModel: MainViewModel
+) {
+    val isShowingCommunity by viewModel.isShowingCommunity.collectAsStateWithLifecycle()
+    val isShowingAnnouncementHistory by viewModel.showAnnouncementHistory.collectAsStateWithLifecycle()
+    val isShowingLeaderboard by viewModel.isShowingLeaderboard.collectAsStateWithLifecycle()
+    val latestAnnouncement by viewModel.latestAnnouncement.collectAsStateWithLifecycle()
+    val showAnnouncementModal by viewModel.showAnnouncementModal.collectAsStateWithLifecycle()
+    val showAnnouncementEditor by viewModel.showAnnouncementEditor.collectAsStateWithLifecycle()
+
+    val appUpdateStatus by viewModel.appUpdateStatus.collectAsStateWithLifecycle()
+    val hasClearedNews by viewModel.hasClearedNews.collectAsStateWithLifecycle()
+
+    if (isShowingAnnouncementHistory) {
+        val announcements by viewModel.announcementHistory.collectAsStateWithLifecycle()
+        Box(modifier = Modifier.fillMaxSize()) {
+            GlyphixBackground()
+            AnnouncementHistoryScreen(
+                announcements = announcements,
+                onDismiss = { viewModel.hideAnnouncementHistory() },
+                onDownloadUpdate = { apkUrl, version -> viewModel.downloadAndInstallUpdate(apkUrl, version) },
+                onClearAll = { viewModel.clearAllAnnouncements() },
+                onClearSingle = { id -> viewModel.clearSingleAnnouncement(id) },
+                onRestoreNews = { viewModel.restoreClearedNews() },
+                hasClearedNews = hasClearedNews,
+                appUpdateStatus = appUpdateStatus
+            )
+        }
+    }
+
+    if (isShowingLeaderboard) {
+        val entries by viewModel.leaderboardEntries.collectAsStateWithLifecycle()
+        Box(modifier = Modifier.fillMaxSize()) {
+            GlyphixBackground()
+            LeaderboardScreen(
+                entries = entries,
+                onDismiss = { viewModel.hideLeaderboard() },
+                onRefresh = { viewModel.updateLeaderboard() }
+            )
+        }
+    }
+
+    if (showAnnouncementModal && latestAnnouncement != null) {
+        AnnouncementModal(
+            announcement = latestAnnouncement!!,
+            onDismiss = { viewModel.dismissAnnouncement() },
+            onDownloadUpdate = { apkUrl, version -> viewModel.downloadAndInstallUpdate(apkUrl, version) },
+            appUpdateStatus = appUpdateStatus
+        )
+    }
+
+    if (showAnnouncementEditor) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GlyphixBackground()
+            AnnouncementEditorScreen(
+                onPost = { t, m, s, l, lt -> viewModel.postAnnouncement(t, m, s, l, lt) },
+                onDismiss = { viewModel.hideAnnouncementEditor() }
+            )
+        }
+    }
+}

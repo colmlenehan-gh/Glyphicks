@@ -1,0 +1,24 @@
+/* existing CSS ... */
+.hero-scene { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 18px; min-height: 100svh; }
+.hero-content { position: relative; z-index: 1; width: min(640px, 100%); }
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  width: min(100%, 820px);
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  background: rgba(14,15,14,.62);
+  transition: border-color 200ms var(--ease), background 200ms var(--ease);
+  z-index: 2;
+}
+.status-banner > svg { flex: none; color: var(--signal); }
+.status-banner p { flex: 1 1 320px; margin: 0; color: #a9aaa3; font-size: 14px; line-height: 1.55; }
+.status-banner strong { color: var(--chalk); font-weight: 600; }
+.status-banner-cta { display: inline-flex; align-items: center; gap: 8px; color: var(--chalk); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.status-banner:hover { border-color: rgba(215,255,69,.5); background: rgba(18,20,15,.72); }
+.status-banner:hover .status-banner-cta { color: var(--signal); }
+.status-banner.is-unreachable { border-color: rgba(226,86,77,.4); }
+
+/* keep the original rules further down, but ensure the banner isn't hidden */
