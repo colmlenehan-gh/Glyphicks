@@ -23,7 +23,7 @@ export interface SpectrumFrame {
 export class AudioAnalyzer {
   private analyser: AnalyserNode;
   private fftSize: number;
-  private frequencyData: Uint8Array;
+  private frequencyData: Uint8Array<ArrayBuffer>;
   private smoothedData: Float32Array;
   private smoothingFactor: number;
   private nyquistHz: number;

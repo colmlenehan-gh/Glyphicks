@@ -17,6 +17,15 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        // Keep the heavy animation libraries out of the entry chunk.
+        manualChunks: {
+          motion: ["gsap", "gsap/ScrollTrigger", "lenis"],
+          react: ["react", "react-dom", "wouter"],
+        },
+      },
+    },
   },
   server: {
     host: true,
